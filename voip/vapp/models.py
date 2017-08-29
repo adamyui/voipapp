@@ -14,8 +14,8 @@ class NumObject(models.Model):
 	
 	title= models.CharField(max_length=50)
 	number= models.IntegerField()
-	ident= models.IntegerField(blank=True, null=True)
-	usersave= models.CharField(max_length=100, blank= True)
+	user = models.OneToOneField(User, blank=True, null=True)
+	
 
 
 	def __str__(self):
