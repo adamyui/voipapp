@@ -2,19 +2,15 @@
 from __future__ import unicode_literals
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-import json
-from django.shortcuts import render, get_object_or_404,redirect
-from .models import NumObject, Sounds, BlackList
-from .forms import PostForm, NumForm, BlacklistForm, AddRules, UpdateAudio
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.views.generic.edit import UpdateView
 from django.urls import reverse
 from django.core.urlresolvers import reverse_lazy
-from braces.views import CsrfExemptMixin
-from debug.decorators import log_exceptions
 
+from .models import NumObject, Sounds, BlackList
+from .forms import PostForm, NumForm, BlacklistForm, AddRules, UpdateAudio
 
-from braces.views import LoginRequiredMixin
 import json
 
 
@@ -83,7 +79,7 @@ def post_create(request):
 	return render(request, 'post_form.html',context,)
 
 
-
+#CREATE NEW AUDIO UPLOAD FROM BLOB
 def post_create_new(request):
 	form= PostForm(request.POST or None, request.FILES or None)
 
@@ -170,39 +166,6 @@ class UpdateSound(AjaxableResponseMixin, UpdateView):
 
 
 
-#THIS ONE WORKS FOR UPDATING EXISTING SOUND
-# def update_audio(request,pk):
-
-# 	instance = get_object_or_404(Sounds, id=pk)
-# 	form = UpdateAudio(request.POST or None, request.FILES, instance=instance)
-
-
-# 	if request.method == 'POST':
-		
-
-# 		if form.is_valid():
-# 			instance = form.save(commit=False)		
-# 			instance.save()
-			
-		
-# 	return HttpResponseRedirect('/')
-
-
-
-def update_audio(request):
-	# instance = get_object_or_404(Sounds)
-	form = PostForm(request.POST or None, request.FILES or None)
-
-
-	if request.method == 'POST':
-		
-
-		if form.is_valid():
-			instance = form.save(commit=False)		
-			instance.save()
-			
-		
-	return HttpResponseRedirect('/')
 
 
 
