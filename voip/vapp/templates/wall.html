@@ -31,7 +31,7 @@
 <!--list wall objects-->
 {% for obj in object_listboy %}	
 	
-	{% if request.user.username == obj.usersave%}
+	{% if request.user.username == obj.user.username%}
 
 	<div class='row'>
 		<div class='col-sm-12'>
