@@ -21,27 +21,15 @@ from .views import UpdateRules, UpdateSound, update_audio
 
 urlpatterns = [
 	url(r'^$', views.index, name= 'list'),
-
 	url(r'^create/$', views.post_create, name= 'post_create'),
 	url(r'^create_new/$', views.post_create, name= 'post_create_new'),
 	url(r'^createnum/$', views.post_createnum),
 	url(r'^update_rules/(?P<pk>[\w-]+)$', UpdateRules.as_view(), name='update_rules'),
-
-
 	#Update the sound by title and File
 	url(r'^update_sound/(?P<pk>[\w-]+)$', UpdateSound.as_view(), name='update_sound'),
-
 	url(r'^(?P<id>\d+)/sound_detail/$', views.sound_detail, name='sound_detail'),
-
 	#Save the edited file
 	url(r'^update_audio/$', views.update_audio, name='update_audio'),
-
-	
-	
-
-	# url(r'^update_audio/(?P<pk>[\w-]+)$', views.update_audio, name='update_audio'),
-
-
 	url(r'^(?P<id>\d+)/$', views.post_detail, name='detail'),
 	url(r'^(?P<id>\d+)/delete/$', views.post_delete, name= 'delete'),
 ]
