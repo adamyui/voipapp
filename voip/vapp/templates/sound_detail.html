@@ -1,0 +1,413 @@
+{% extends "header.html" %}
+{% block content %}
+{% load staticfiles %}
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.4.0/wavesurfer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.4.0/plugin/wavesurfer.regions.min.js"></script>
+
+
+
+
+<div class='col-md-10 col-md-offset-1'>
+<h4>Move and drag the edges of the grey area to include the part of the audio you want to keep. Then click "trim to selected region" and save the file. </h4>
+
+<!-- FORM ERRORS -->
+
+
+
+
+
+
+
+<div class='thumbnail'>
+
+						
+		<div class='caption'>
+		<div id="waveform">
+
+		</div>
+
+
+
+							
+				<button type="button" class="btn btn-primary" onclick="wavesurfer.playPause()">Play</button>
+
+				<button type="button" class="btn btn-warning" id='trim'>Trim to selected region</button>
+
+				<!-- UPLOAD BLOB FORM -->
+
+
+				<div style="float:right;">
+
+
+				<!-- UPLOAD NEW BTN -->
+				<!-- <a style="font-size: 10px" class="contact" href="#" data-form="{% url 'posts:update_sound' instance.pk %}">				
+					<button type="button" class="btn btn-warning" id=''>Upload New Sound/Rename</button></a> -->
+
+
+
+				<a  href="/{{instance.id}}/delete/"><button type="button" class="btn btn-danger">Delete Sound</button></a>
+				</div>
+
+
+				<audio>
+				  <source src="{{instance.sound.url}}" type="audio/wav">								 
+				</audio>
+				
+				<!-- <div class="col-xs-10">
+						<input id="slider" type="range" min="1" max="200" value="1" style="width: 100%" />
+				</div> -->
+
+		</div>
+							
+</div>
+
+<div class="hider">
+	<form id='update_audio' enctype="multipart/form-data" method="post" style="display: inline;" action= "{% url 'posts:post_create_new' %}">
+					{% csrf_token %}
+					<!-- {{form.as_p}} -->
+					Save As:
+					<input type="text" name="title" required="" id="id_title" maxlength="50" value="{{instance.title}}_02 ">
+
+					<select name="numobj" required="" id="id_numobj" style="display: none;">
+					  <option value="" selected="">---------</option>
+
+					  <option value="1" selected="selected">Test_Number_1</option>
+
+					  <option value="2">Test_Number_2</option>
+
+					</select>
+
+					<!-- {{form.numobj}} -->
+					<!-- <input type="file" name="sound" id="id_sound" style="display: none;"> -->
+								   
+					<input class="btn btn-primary" type="submit" value="Save Edited File" style="display: inline;">  					 
+	</form> 
+
+
+
+
+
+
+
+<!-- CONTACT MODAL -->
+	<div class="modal" id="contactModal">
+	</div>	
+
+
+</div>
+
+
+
+
+
+
+<script type="text/javascript">
+				
+	
+//HIDE SAVE FORM
+var hider = $("div.hider");
+hider.hide();
+
+//SHOW SAVE FORM
+$("#trim").click(function() {
+	hider.show();
+	console.log(start);
+	console.log(end);
+	window.start= 0.01;
+	window.end = window.duration - 0.01;	
+
+});
+
+
+//WAVESURFER WAVE
+	var start = 0.1;
+	var end = 0.3;
+	var duration;
+	var buffer;
+	var blob;
+
+	
+	
+
+
+//WAVESURFER INSTANCE
+			var wavesurfer = WaveSurfer.create({
+				    container: '#waveform',
+				    waveColor: 'white',
+				    progressColor: 'white'
+				});
+				
+				//LOAD SOUND
+				wavesurfer.load('{{instance.sound.url}}');
+
+
+
+				//ADD REGION
+				wavesurfer.on('ready', function () {
+				  
+				  var r= wavesurfer.addRegion({
+				  	id: 'clip',
+				    start: window.start, // time in seconds
+				    end: window.end, // time in seconds
+				    color: 'hsla(120, 20%, 75%, 0.2)',				    				    
+				  });
+				  r.type = 'edit';
+
+
+				 
+				  $(".wavesurfer-handle").css({'max-width': '15px', 'width':'10%', 'background-color': 'hsla(360, 100%, 100%, 0.33)'});
+				
+
+				//PLAY SELECTED REGION ON CLICK LISTENER
+				wavesurfer.on('region-click', function (region, e) {
+			        e.stopPropagation();
+			        // Play on click, loop on shift click
+			        e.shiftKey ? region.playLoop() : region.play();
+			        
+			    });
+
+				wavesurfer.on('region-update-end', function (region, e) {
+					
+			        start = region.start;
+			        end = region.end;
+			        duration = end-start;
+			        console.log(duration);
+				});
+
+
+				//TRIM TO SELECTION LISTENER
+				document.getElementById("trim").addEventListener("click", function(){
+
+
+			        	//CREATE NEW BUFFER
+			        	var bufferGlob = createBuffer(wavesurfer.backend.buffer, duration);
+			        		buffer=bufferGlob;
+			        		
+
+			        	//COPY
+			        	copyBuffer(wavesurfer.backend.buffer, start, end, buffer, 0)
+
+			        	// LOAD NEW BUFFER
+			        	wavesurfer.clearRegions()
+						wavesurfer.empty()
+						wavesurfer.loadDecodedBuffer(buffer)
+						call(buffer);
+
+
+						
+					    
+						});
+
+			});
+
+
+
+
+
+//COPY BUFFER TO BLOB
+
+				//BLOB RECORDER WORKER
+				function call(buffer) {
+
+					var worker = new Worker("{% static 'js/recorderWorker.js'%}");
+
+					// initialize the new worker
+					worker.postMessage({
+					  command: 'init',
+					  config: {sampleRate: 48000}
+					});
+
+					// callback for `exportWAV`
+					worker.onmessage = function( e ) {
+					  window.blob = e.data;
+					  
+					  console.log(blob);
+					  var url = URL.createObjectURL(blob);
+					  console.log(url);
+
+
+					 //  var sound      = document.createElement('audio');
+						// sound.id       = 'audio-player';
+						// sound.controls = 'controls';
+						// sound.src      = url;
+						// sound.type     = 'audio/wav';
+						// document.getElementById('song').appendChild(sound);
+					  // $('#source').attr('src', url);
+					  // this is the WAV blob
+					};
+					
+					// send the channel data from our buffer to the worker
+					worker.postMessage({
+					  command: 'record',
+					  buffer: [
+					    buffer.getChannelData(0), 
+					    buffer.getChannelData(1)
+					  ]
+					});
+
+					// ask the worker for a WAV
+					worker.postMessage({
+					  command: 'exportWAV',
+					  type: 'audio/wav'
+					});
+
+
+										
+
+				};
+
+
+			//CREATEBUFFER FUNC
+			function createBuffer(originalBuffer, duration) {
+			  var sampleRate = originalBuffer.sampleRate
+			  var frameCount = duration * sampleRate
+			  var channels = originalBuffer.numberOfChannels 
+			  return new AudioContext().createBuffer(channels, frameCount, sampleRate)
+			}
+
+			//COPYBUFFER FUNC
+			function copyBuffer(fromBuffer, fromStart, fromEnd, toBuffer, toStart) {
+			  var sampleRate = fromBuffer.sampleRate
+			  var frameCount = (fromEnd - fromStart) * sampleRate
+			  for (var i = 0; i < fromBuffer.numberOfChannels; i++) {
+			      var fromChanData = fromBuffer.getChannelData(i)
+			      var toChanData = toBuffer.getChannelData(i)
+			      for (var j = 0, f = Math.round(fromStart*sampleRate), t = Math.round(toStart*sampleRate); j < frameCount; j++, f++, t++) {
+			          toChanData[t] = fromChanData[f]
+			      }
+			  }
+			}
+
+
+
+
+
+// AJAX USER FORM UPLOAD EDITED FILE IN SAME LOCATION 
+		function upload(event) {
+			event.preventDefault();
+			
+			//SESSION CSRF
+			var csrftoken = getCookie('csrftoken');
+
+			//APPEND GLOBAL BLOB TO FORMDATA INSTANCE
+			var blob= window.blob
+			var data = new FormData();
+			data.append('sound', blob);
+			console.log(blob);
+			console.log(data);
+			console.log(csrftoken);
+
+			//GRAB SESSION COOKIE			
+			function getCookie(name) {
+			    var cookieValue = null;
+			    if (document.cookie && document.cookie !== '') {
+			        var cookies = document.cookie.split(';');
+			        for (var i = 0; i < cookies.length; i++) {
+			            var cookie = jQuery.trim(cookies[i]);
+			            // Does this cookie string begin with the name we want?
+			            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+			                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+			                break;
+			            }
+			        }
+			    }
+			    return cookieValue;
+			}
+
+			function csrfSafeMethod(method) {
+			    // these HTTP methods do not require CSRF protection
+			    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+			}
+
+			//AJAX CALL
+			$.ajaxSetup({
+			    beforeSend: function(xhr, settings) {
+			        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+			            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+			        }
+			    }
+			});
+			// debugger;
+			$.ajax({
+			    url: "{% url 'posts:post_create_new' %}",
+			    type: 'POST',
+			    data: data,   
+			    cache: false,
+			    processData: false,
+			    contentType: false,
+			    success: function(data) {
+			        alert(data);
+			    }
+			    
+			});
+			return false;
+			 }
+
+			//EVENT LISTENER FOR UPLOAD/OVERWRITE ORIGINAL FILE
+			// $(function() {
+			//     $('#update_audio').submit(upload);
+			// });
+
+
+
+
+
+
+//XHR USER FORM UPLOAD EDITED FILE IN NEW LOCATION
+	var form = document.getElementById('update_audio');
+	form.onsubmit = function() {
+	
+	  var blob= window.blob	
+	  var formData = new FormData(form);
+
+	  console.log(blob);
+
+	  formData.append('sound', blob);
+
+	  var xhr = new XMLHttpRequest();
+	  
+	  xhr.open('POST', form.getAttribute('action'), true);
+	  xhr.send(formData);
+
+	  return false; // To avoid actual submission of the form
+}
+
+
+
+
+
+//UPDATEVIEW JQUERY FOR CHANGING UPLOAD FILE AND NAME
+	$(document).ready(function() {
+
+			$(".contact").click(function(ev) { // for each edit contact url
+		        ev.preventDefault(); // prevent navigation
+		        var url = $(this).data("form"); // get the contact form url
+		        console.log(url);
+		        $("#contactModal").load(url, function() { // load the url into the modal
+		            $(this).modal('show'); // display the modal on url load
+		        });
+		        return false; // prevent the click propagation
+		    });
+
+		    $('.contact-form').on('submit',function() {
+		        $.ajax({ 
+		            type: $(this).attr('method'), 
+		            url: this.action, 
+		            data: $(this).serialize(),
+		            context: this,
+		            success: function(data, status) {
+		                $('#contactModal').html(data);
+		            }
+		            
+		        });
+
+		        return false;
+		    });
+	});
+
+
+
+						
+</script>
+{% endblock %}

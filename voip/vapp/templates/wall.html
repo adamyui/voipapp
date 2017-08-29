@@ -1,0 +1,73 @@
+{% extends "header.html" %}
+{% block content %}
+{% load staticfiles %}
+
+
+<!-- HOWLER INSTANCE -->
+<script type="text/javascript">
+
+	function create(src){
+		var sound = new Howl({
+			src:[src],
+			format: ['wav'],
+			volume: 0.5,
+
+		});
+		
+		var play = sound.play();
+		console.log(sound);												
+	}	
+
+</script>
+
+<!-- USER PHONE NUMBER LIST DIV -->
+<div class='col-sm-8 col-sm-offset-2'>
+
+	<div class='thumbnail'>
+		<h3 class="text-center">My Phone Numbers</h3>
+		<p class="text-center"><a class="btn btn-success" style="color: #ffffff" href="/createnum">Add a Number</a></p>
+	</div>
+
+<!--list wall objects-->
+{% for obj in object_listboy %}	
+	
+	{% if request.user.username == obj.usersave%}
+
+	<div class='row'>
+		<div class='col-sm-12'>
+			<div class='thumbnail'>
+				<p style="font-size: 20px; color:#ffffff">{{obj.title}}</p>
+				<p style="font-size: 20px"><a href= '/{{obj.id}}/'>{{obj.number}}</a></p>
+			</div>
+		</div>
+	</div>
+	{% endif %}
+	
+{% endfor %}
+
+
+
+<!-- DISPLAY SOUNDS -->
+
+<h4>My Sound Library</h4>
+
+{% for obj in instance %}
+	<ul>
+		<div class='thumbnail'>				
+			<div class='caption'>
+			<p style="color:#ffffff">{{obj.title}}</p>
+
+				<button type="button" class="btn btn-primary"><a onclick="create('{{obj.sound.url}}')" style="color: white;">Play</a></button>
+				<button type="button" class="btn btn-warning" id='trim'><a href="/{{obj.id}}/sound_detail/" style="color: white;">Edit</a></button>
+				<!-- {{obj.unique_id}} -->
+			</div>
+		</div>
+	</ul>
+{% endfor %}
+
+
+</div>
+
+
+
+{% endblock %}

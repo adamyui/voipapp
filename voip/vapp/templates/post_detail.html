@@ -1,0 +1,217 @@
+{% extends "header.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+
+
+<script type="text/javascript">
+// OPEN UPDATEVIEW IN MODAL
+$(document).ready(function() {
+
+		$(".contact").click(function(ev) { // for each edit contact url
+	        ev.preventDefault(); // prevent navigation
+	        var url = $(this).data("form"); // get the contact form url
+	        console.log(url);
+	        $("#contactModal").load(url, function() { // load the url into the modal
+	            $(this).modal('show'); // display the modal on url load
+	        });
+	        return false; // prevent the click propagation
+	    });
+
+	    $('.contact-form').on('submit',function() {
+	        $.ajax({ 
+	            type: $(this).attr('method'), 
+	            url: this.action, 
+	            data: $(this).serialize(),
+	            context: this,
+	            success: function(data, status) {
+	                $('#contactModal').html(data);
+	            }
+
+	        });
+
+	        return false;
+	    });
+});
+</script>
+
+
+
+
+
+<!-- LEFT SIDE  -->
+
+  		<div class="thumbnail col-sm-4 pad-left">
+  			<!-- ADD INCOMING NUM FORM -->
+			<form name="" method='POST' action='.' enctype='multipart/form-data'>{% csrf_token %}
+				<p>Add Incoming Number</p>
+
+
+					<select required name="incomingnum-numkey" id="incomingnum-numkey" style="display: none;">
+							<option value='{{instance.id}}' selected></option>
+					</select>
+				<input type="number" name="incomingnum-bnum" id= 'id_incomingnum-bnum'/>
+
+				<input id= '' class="btn btn-success" type= 'submit' style="" value="Add"/><br><br>
+			</form>	
+
+
+
+
+<!-- DISPLAY INCOMING NUMBER LIST -->
+		
+			{% for obj in instance.blacklist_set.all %}
+				<li style="list-style-type: none">
+
+
+				<!-- INCOMING NUMBERS TABLE	 -->
+
+				<table class="table table-bordered">
+  					
+				  <tbody>
+				    <tr>
+				      <!-- TABLE FIRST COLUMN -->
+				      <td>{{obj.bnum}}
+				     	<div class="btn-group">
+  							<button class="dropdown-toggle btn-success btn-sm" type="button" data-toggle="dropdown">Add Rule
+  							<span class="caret"></span></button>
+  								<ul class="dropdown-menu ">
+    								<li><a class="contact" href="#" data-form="{% url 'posts:update_rules' obj.pk %}">Block</a></li>
+    							</ul>
+						</div>
+				      </td>
+
+				      <!-- TABLE SECOND COLUMN -->
+				      <td>
+				      	{% if obj.blocked is True %}
+				      	<p style="font-size: 12px">Blocked
+				      		<a style="font-size: 10px" class="contact" href="#" data-form="{% url 'posts:update_rules' obj.pk %}">Edit</a>
+				      	</p>
+				      	{% elif obj.blocked is False  %}
+				      	<p style="font-size: 12px;  visibility: hidden;">No rules yet</p>
+
+				      	{% endif %}
+
+				      </td>
+				      
+				    </tr>
+				   </tbody>
+				</table>				
+				</li>
+				
+			
+			{% endfor %}	 			
+		
+
+		</div>
+
+<!-- RIGHT SIDE -->
+
+
+<div class='container'>
+	<div class="col-sm-8" style="">
+	
+<!-- MODAL FORM -->
+
+		<div class="modal" id="contactModal">
+		</div>	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<!-- <input type="text" name="rules-days" required id= "id_rules-days" maxlength='21'><br><br>
+			<p>Block number?</p>
+			<label for='id_rules-bloacked'>Blocked:</label>
+			<input type="checkbox" name="rules-blocked" id='id_rules-bloacked'>
+
+			<label for='sound'>Play Sound:</label>
+			<input type="checkbox" name="" id='sound'><br><br>
+			<br><br> 	 -->	
+			<!-- <input  class="btn btn-success" type= 'submit' style="" value="Add Rules"/> -->
+			<!-- </form>
+
+			<br><br> -->
+			<!-- <a class="btn btn-success" style="color: #ffffff"  href="/create">Add new sound</a> -->
+
+
+			</div>
+
+		</div>
+	<!-- </div>
+ -->
+<!-- </div> -->
+
+	 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+<!-- 					<div class='row'>
+					<div class='col-sm-12'>
+						<div class='thumbnail'>
+						
+							<div class='caption'>
+								<audio controls>
+									<source src="{{obj.sound.url}}" type="audio/wav">
+				  					<source src="{{obj.sound.url}}" type="audio/ogg">
+				  					<source src="{{obj.sound.url}}" type="audio/mpeg">
+				   					<source src="{{obj.sound.url}}" type="audio/mp4">
+									Your browser does not support the audio element.
+								</audio>
+
+							</div>
+							
+						</div>
+						
+					</div>
+
+				</div>
+
+				</div> -->
+
+
+
+
+
+
+<!-- <audio controls>
+  		<source src="{{instance.sound.url}}" type="audio/ogg">
+  		<source src="{{instance.sound.url}}" type="audio/mpeg">
+		Your browser does not support the audio element.
+</audio><br/> -->
+
+
+
+
+
+
+
+
+{% endblock %}

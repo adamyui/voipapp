@@ -1,0 +1,35 @@
+<form method="post" class="well contact-form" action="{% url 'posts:update_sound' form.instance.pk %}">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Edit and save</h3>
+  </div>
+
+  <div class="modal-body">
+       {% csrf_token %}
+       <p>Title:</p>
+       <!-- TITLE -->
+       {{form.title}}<br><br>
+
+       <!-- NUMOBJ -->
+       <select name="numobj" required="" id="id_numobj" style="display:none">
+  			<option value="">---------</option>
+
+  			<option value="1" selected="">Test_Number_1</option>
+
+  			<option value="2">Test_Number_2</option> 			 			
+		</select>
+
+		<!-- SOUND -->
+		<input type="file" name="sound" id="id_sound" value=''>
+
+
+
+
+      <!-- {{ form.as_p }} -->
+  </div>
+
+  <div class="modal-footer">
+         <input class="btn btn-primary" type="submit" value="Save" />
+  </div>
+
+</form> 

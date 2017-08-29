@@ -1,0 +1,80 @@
+{% extends "header.html" %}
+
+{% block content %}
+
+
+<div class= 'border'>
+<div class= 'center_div'>
+<div class="row vertical-center-row">
+
+ 
+<!--post form-->
+
+<form method='POST' action='' enctype='multipart/form-data'>{% csrf_token %}
+
+
+<!-- Form Errors -->
+
+
+{% if form.errors %}
+        {% for field in form %}
+            {% for error in field.errors %}
+                <p style="color: #ff8370;">
+                    {{field}}
+                    {{ error|escape }}
+                </p>
+            {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+            <p style="color: #ff8370;">
+                {{ error|escape }}
+            </p>
+        {% endfor %}
+{% endif %}
+
+
+
+
+
+
+
+	<p id='update' style="color: #ff8370;"></p>
+
+    </br></br>
+
+<!--   <p>Phone Number:</p>
+  <input  id='number'  type= 'number' step='any' value='0' name='number' >
+  <p>Identifier:</p>
+  <input  id='ident'  type= 'number' step='any' value='0' name='ident' >
+  <p>Title:</p>
+	<input id= 'title' type= 'text' name= 'title'> </br></br>
+	<p>Upload:</p>
+  <input id= 'soundid' type="file" name="sound" accept='audio/*'></br></br>
+  <p>Username:</p>
+  <input  id='usersave'  type= 'text' name='usersave' value='{{ request.user }}' readonly ></br></br> -->
+
+<!--   <p>Title:</p>
+  <input id= 'title' type= 'text' name= 'title'> </br></br>
+  <p>Upload:</p>
+  <input id= 'sound' type="file" name='sound' accept='audio/*'></br></br> -->
+
+  {{form.as_p}}
+
+    
+
+		<input id= 'allow' class="btn btn-success" type= 'submit' style="font-size: 25px; width: 100%" value="Add Sound"/>
+</form>
+
+
+
+
+
+
+</div>
+</div>
+</div>
+
+
+
+
+{% endblock %}

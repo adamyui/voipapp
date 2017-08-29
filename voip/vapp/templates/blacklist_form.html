@@ -1,0 +1,209 @@
+
+{% load crispy_forms_tags %}
+
+<script type="text/javascript">
+  
+
+// CONDITIONAL FORM VARS
+var blocked_conditional_field = $("div.days");
+var times_sun = $("div.sun");
+var times_mon = $("div.mon");
+var times_tue = $("div.tue");
+var times_wed = $("div.wed");
+var times_thu = $("div.thu");
+var times_fri = $("div.fri");
+var times_sat = $("div.sat");
+
+
+blocked_conditional_field.hide();
+times_sun.hide();
+times_mon.hide();
+times_tue.hide();
+times_wed.hide();
+times_thu.hide();
+times_fri.hide();
+times_sat.hide();
+
+
+$("#ckbCheckAll").click(function () {
+    $("#id_rules-sun").prop('checked', $(this).prop('checked'));
+    $("#id_rules-mon").prop('checked', $(this).prop('checked'));
+    $("#id_rules-tue").prop('checked', $(this).prop('checked'));
+    $("#id_rules-wed").prop('checked', $(this).prop('checked'));
+    $("#id_rules-thu").prop('checked', $(this).prop('checked'));
+    $("#id_rules-fri").prop('checked', $(this).prop('checked'));
+    $("#id_rules-sat").prop('checked', $(this).prop('checked'));
+    times_sun.show();
+    times_mon.show();
+    times_tue.show();
+    times_wed.show();
+    times_thu.show();
+    times_fri.show();
+    times_sat.show();
+
+});
+
+
+
+
+$("#id_rules-blocked").change(function() {
+    if ($(this).prop('checked')) {
+        blocked_conditional_field.show();
+    } else {
+        blocked_conditional_field.hide();
+    }
+});
+
+$("#id_rules-sun").change(function() {
+    if ($(this).prop('checked')) {
+        times_sun.show();
+    } else {
+        times_sun.hide();
+    }
+});
+
+$("#id_rules-mon").change(function() {
+    if ($(this).prop('checked')) {
+        times_mon.show();
+    } else {
+        times_mon.hide();
+    }
+});
+$("#id_rules-tue").change(function() {
+    if ($(this).prop('checked')) {
+        times_tue.show();
+    } else {
+        times_tue.hide();
+    }
+});
+$("#id_rules-wed").change(function() {
+    if ($(this).prop('checked')) {
+        times_wed.show();
+    } else {
+        times_wed.hide();
+    }
+});
+$("#id_rules-thu").change(function() {
+    if ($(this).prop('checked')) {
+        times_thu.show();
+    } else {
+        times_thu.hide();
+    }
+});
+$("#id_rules-fri").change(function() {
+    if ($(this).prop('checked')) {
+        times_fri.show();
+    } else {
+        times_fri.hide();
+    }
+});
+$("#id_rules-sat").change(function() {
+    if ($(this).prop('checked')) {
+        times_sat.show();
+    } else {
+        times_sat.hide();
+    }
+});
+
+
+
+
+
+
+</script>
+
+
+
+<!-- MODAL FORM -->
+<form class="well contact-form" method="post" action="{% url 'posts:update_rules' form.instance.pk %}">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">×</button>
+    <h3>Edit Rule</h3>
+  </div>
+  <div class="modal-body">
+       {% csrf_token %}
+       
+  <h4>Number:</h4>
+  <br>
+       {{form.bnum}}
+  <br><br> 
+
+{% if form.instance.blocked is True %}
+  <h4>Block:<input type='checkbox' name='rules-blocked' class='checkboxinput' id='id_rules-blocked' checked="checked"></h4>
+  <script type="text/javascript">blocked_conditional_field.show();</script>
+{% elif form.instance.blocked is False %}
+  <h4>Block:<input type='checkbox' name='rules-blocked' class='checkboxinput' id='id_rules-blocked'></h4>
+  <br>
+{% endif %}
+ 
+
+
+
+
+
+
+
+
+<div class='days'>
+
+      <p>
+       Sun:
+       {{form.sun}} |
+       Mon:
+       {{form.mon}} |
+       Tues:
+       {{form.tue}} |
+       Wed:
+       {{form.wed}} |
+      </p>
+      <p>
+       Thurs:
+       {{form.thu}} |
+       Fri:
+       {{form.fri}} |
+       Sat:
+       {{form.sat}} |       
+      </p>
+      Check All:
+      <input type="checkbox" id="ckbCheckAll" />
+</div>
+
+
+
+
+
+
+<div class='sun'><h4>Sunday Times Blocked:</h4>{{form.sun_begin_time}}{{form.sun_end_time}}</div>
+<div class="mon"><h4>Monday Times Blocked:</h4>{{form.mon_begin_time}}{{form.mon_end_time}}</div>
+<div class="tue"><h4>Tuesday Times Blocked:</h4>{{form.tue_begin_time}}{{form.tue_end_time}}</div>
+<div class="wed"><h4>Wednesday Times Blocked:</h4>{{form.wed_begin_time}}{{form.wed_end_time}}</div>
+<div class="thu"><h4>Thursday Times Blocked:</h4>{{form.thu_begin_time}}{{form.thu_end_time}}</div>
+<div class="fri"><h4>Friday Times Blocked:</h4>{{form.fri_begin_time}}{{form.fri_end_time}}</div>
+<div class="sat"><h4>Saturday Times Blocked:</h4>{{form.sat_begin_time}}{{form.sat_end_time}}</div>
+
+
+
+
+
+
+
+  </div>
+    <div class="modal-footer">
+       <input class="btn btn-primary" type="submit" value="Save" />
+       
+    </div>
+</form>   
+
+
+
+{% for obj in instance.sounds_set.all %}
+  {% include 'sound_detail.html' with sound=obj %} 
+{% endfor %}
+
+
+
+
+
+
+
+

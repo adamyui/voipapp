@@ -1,0 +1,21 @@
+{% extends "location/header.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div id= "formdiv" class='col-md-6'>
+<form method="post" action=".">
+  {% csrf_token %}
+
+    {% for field in form %}
+        <div class="formdiv">
+            {{ field.errors }}
+            <p>{{ field.label_tag }}</p> </br>{{ field }}
+        </div>
+        </br>
+    {% endfor %}
+
+  <input class="btn btn-success" type="submit" value="{% trans 'Submit' %}" />
+</form>
+{% endblock %}
+</div>
